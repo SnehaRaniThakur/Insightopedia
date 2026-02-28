@@ -1,7 +1,7 @@
 import os
 import pdfplumber
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 from PIL import Image
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
