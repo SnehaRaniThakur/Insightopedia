@@ -21,7 +21,7 @@ if not api_key:
 if not api_key:
     raise ValueError("GOOGLE_API_KEY not found.")
 
-client = genai.Client(api_key=api_key)
+genai.configure(api_key=api_key)
 
 def extract_text_from_pdf(upload_file, max_pages=60):
     text = ""
@@ -36,48 +36,30 @@ def extract_text_from_pdf(upload_file, max_pages=60):
 
 def generate_response(prompt):
     try:
-        response = client.models.generate_content(
-            model="models/gemini-2.5-flash",
-            contents=[
-                {
-                    "role": "user",
-                    "parts": [{"text": prompt}]
-                }
-            ]
-        )
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt)
 
-        if response.candidates:
-            return response.candidates[0].content.parts[0].text
+        if response.text:
+            return response.text
         else:
             return "AI returned empty response."
 
     except Exception:
         return "⚠️ AI service temporarily unavailable. Please try again later."
 
-def extract_text_from_image(uploaded_file):
-    image_bytes = uploaded_file.read()
+def generate_response(prompt):
+    try:
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt)
 
-    response = client.models.generate_content(
-        model="models/gemini-2.5-flash",
-        contents=[
-            {
-                "role": "user",
-                "parts": [
-                    {"text": "Extract all readable text from this insurance document image clearly and accurately."},
-                    {
-                        "inline_data": {
-                            "mime_type": uploaded_file.type,
-                            "data": image_bytes
-                        }
-                    }
-                ]
-            }
-        ]
-    )
+        if response.text:
+            return response.text
+        else:
+            return "AI returned empty response."
 
-    if response.candidates:
-        return response.candidates[0].content.parts[0].text
-    return ""
+    except Exception:
+        return "⚠️ AI service temporarily unavailable. Please try again later."
+
 
 
 def smart_trim(text, limit=12000):
